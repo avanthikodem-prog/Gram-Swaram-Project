@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GramSwaram</title>
+    <style>
+        body { margin: 0; font-family: Segoe UI, Arial, sans-serif; background: #f5f7fb; color: #1d2b3a; }
+        .header { background: #154360; color: #fff; padding: 14px 20px; font-size: 20px; font-weight: 700; }
+        .container { max-width: 960px; margin: 0 auto; padding: 16px; }
+        .card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); padding: 16px; margin-bottom: 16px; }
+        h2 { margin: 0 0 12px; font-size: 22px; }
+        h3 { margin: 0 0 8px; font-size: 18px; }
+        .muted { color: #526375; font-size: 14px; margin-bottom: 10px; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        label { display: block; font-size: 14px; margin-bottom: 6px; color: #34495e; }
+        input, select, button { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px; border: 1px solid #c9d3df; font-size: 14px; }
+        button { cursor: pointer; border: none; background: #1f6feb; color: #fff; font-weight: 600; }
+        button.secondary { background: #e9eef6; color: #1d2b3a; border: 1px solid #d0dae7; }
+        button:disabled { opacity: 0.6; cursor: not-allowed; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .status { margin-top: 10px; font-size: 14px; font-weight: 600; }
+        .ok { color: #0f8c46; }
+        .error { color: #c0392b; }
+        .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+        .shop-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; }
+        .shop-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+        .kv { font-size: 14px; margin: 4px 0; color: #334155; }
+        .badge { display: inline-block; background: #e0f2fe; color: #0c4a6e; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; }
+        .product-list { margin-top: 8px; padding-left: 18px; }
+        .product-list li { margin: 4px 0; font-size: 14px; }
+        .hidden { display: none; }
+        .home-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; margin-top: 12px; }
+        .home-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.08s ease-in-out, box-shadow 0.08s ease-in-out;
+            user-select: none;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .home-card:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(0,0,0,0.08); }
+        .home-icon { font-size: 34px; line-height: 1; margin-bottom: 8px; }
+        .home-label-en { font-size: 18px; font-weight: 800; }
+        .home-label-te { font-size: 16px; font-weight: 700; color: #1f6feb; margin-top: 4px; }
+        .login-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+        .login-type-btn {
+            font-size: 18px;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            background: #e9eef6;
+            color: #1d2b3a;
+            border: 2px solid #d0dae7;
+        }
+        .login-type-btn.active {
+            background: #1f6feb;
+            color: #fff;
+            border-color: #1f6feb;
+        }
+        .vendor-item-row {
+            display: grid;
+            grid-template-columns: 1fr 90px 120px;
+            gap: 10px;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 52px;
+            height: 28px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            inset: 0;
+            background-color: #cbd5e1;
+            border-radius: 999px;
+            transition: .2s;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            top: 4px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .2s;
+        }
+        .switch input:checked + .slider { background-color: #22c55e; }
+        .switch input:checked + .slider:before { transform: translateX(24px); }
+        .stock-label.on { color: #15803d; font-weight: 700; }
+        .stock-label.off { color: #b91c1c; font-weight: 700; }
+        .mini-map {
+            width: 100%;
+            height: 140px;
+            border: 0;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        .order-highlight {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        @media (max-width: 720px) {
+            .row, .actions, .login-type-grid { grid-template-columns: 1fr; }
+            .vendor-item-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">GramSwaram - గ్రామ స్వరం</div>
+    <div class="container">
+        <section class="card" id="login-screen">
+            <h2>Login / లాగిన్</h2>
+            <p class="muted">Choose login type first.</p>
+            <div class="login-type-grid">
+                <button id="customer-login-btn" class="login-type-btn active" onclick="selectLoginType('CUSTOMER')">Customer Login</button>
+                <button id="vendor-login-btn" class="login-type-btn" onclick="selectLoginType('VENDOR')">Vendor Login</button>
+            </div>
+
+            <div id="customer-form">
+                <div class="row">
+                    <div>
+                        <label for="customer-phone">Mobile Number</label>
+                        <input id="customer-phone" type="text" placeholder="e.g. 9000000001">
+                    </div>
+                </div>
+            </div>
+
+            <div id="vendor-form" class="hidden">
+                <div class="row">
+                    <div>
+                        <label for="vendor-name">Name</label>
+                        <input id="vendor-name" type="text" placeholder="Vendor name">
+                    </div>
+                    <div>
+                        <label for="vendor-phone">Mobile Number</label>
+                        <input id="vendor-phone" type="text" placeholder="e.g. 9000000002">
+                    </div>
+                </div>
+                <div class="row" style="margin-top:12px;">
+                    <div>
+                        <label for="vendor-shop-name">Shop Name</label>
+                        <input id="vendor-shop-name" type="text" placeholder="Your shop name">
+                    </div>
+                </div>
+                <div class="row" style="margin-top:12px;">
+                    <div>
+                        <label for="vendor-photo">Shop Photo</label>
+                        <input id="vendor-photo" type="file" accept="image/*">
+                    </div>
+                </div>
+            </div>
+            <div class="actions">
+                <button id="send-otp-btn" onclick="requestOtp()">Send OTP</button>
+                <button class="secondary" onclick="fillDemoCredentials()">Use Demo</button>
+            </div>
+            <div class="row" style="margin-top:12px;">
+                <div>
+                    <label for="otp">Enter OTP</label>
+                    <input id="otp" type="text" placeholder="6-digit OTP">
+                </div>
+                <div style="display:flex; align-items:end;">
+                    <button id="verify-btn" onclick="verifyOtp()">Verify OTP & Continue</button>
+                </div>
+            </div>
+            <div id="auth-status" class="status"></div>
+        </section>
+
+        <section class="card hidden" id="shops-screen">
+            <h2>Nearby Shops / సమీప దుకాణాలు</h2>
+            <p class="muted">Auto-filtered within 15km based on your location.</p>
+            <div class="actions">
+                <button onclick="findNearbyShops()">Detect My Location & Load Shops</button>
+                <button class="secondary" onclick="loadNearbyWithFallback()">Use Demo Location</button>
+            </div>
+            <div id="gps-status" class="status"></div>
+            <div style="margin-top:12px;">
+                <span class="badge" id="login-badge">Not logged in</span>
+            </div>
+            <div id="shop-list" class="shop-grid" style="margin-top:12px;"></div>
+        </section>
+
+        <section class="card hidden" id="home-screen">
+            <h2>Home / హోమ్</h2>
+            <p class="muted">Voice: say <strong>Food</strong> / <strong>Idli</strong> / <strong>ఇడ్లీ</strong>.</p>
+            <div class="home-grid">
+                <div class="home-card" onclick="onHomeCardClick('FOOD')">
+                    <div class="home-icon">🍲</div>
+                    <div class="home-label-en">Food</div>
+                    <div class="home-label-te">ఆహారం</div>
+                </div>
+                <div class="home-card" onclick="onHomeCardClick('GROCERIES')">
+                    <div class="home-icon">🛒</div>
+                    <div class="home-label-en">Groceries</div>
+                    <div class="home-label-te">సరుకులు</div>
+                </div>
+                <div class="home-card" onclick="onHomeCardClick('PHARMACY')">
+                    <div class="home-icon">💊</div>
+                    <div class="home-label-en">Pharmacy</div>
+                    <div class="home-label-te">మందులు</div>
+                </div>
+            </div>
+            <div class="actions" style="margin-top:14px;">
+                <button onclick="startHomeVoiceRecognition()">🎤 Say Food / Idli</button>
+                <button class="secondary" onclick="showSectionSmooth('shops-screen')">Nearby Shops</button>
+            </div>
+            <div id="home-voice-status" class="status"></div>
+        </section>
+
+        <section class="card hidden" id="gps-screen">
+            <h2>GPS / జీపీఎస్</h2>
+            <p class="muted">Please turn on GPS / జీపీఎస్ ఆన్ చేయండి</p>
+            <div class="actions">
+                <button onclick="requestGpsAgain()">Try Again</button>
+            </div>
+            <div id="gps-screen-status" class="status"></div>
+        </section>
+
+        <section class="card hidden" id="food-screen">
+            <h2>Food / ఆహారం</h2>
+            <div class="shop-card">
+                <div class="shop-title">Sri Rama Tea & Tiffins</div>
+                <div class="kv"><strong>English:</strong> Sri Rama Tea & Tiffins</div>
+                <div class="kv"><strong>Telugu:</strong> శ్రీ రామా టీ & టిఫిన్స్</div>
+                <div class="kv" id="customer-food-menu"></div>
+                <div class="actions" style="margin-top:10px;">
+                    <button onclick="startFoodOrderVoiceRecognition()">🎤 Speak Idli Order</button>
+                </div>
+                <div id="food-order-status" class="status"></div>
+                <div id="food-order-summary" class="order-highlight hidden"></div>
+            </div>
+            <div class="actions">
+                <button class="secondary" onclick="showSectionSmooth('home-screen')">Back to Home</button>
+            </div>
+        </section>
+
+        <section class="card hidden" id="groceries-screen">
+            <h2>Groceries / సరుకులు</h2>
+            <div class="shop-card">
+                <div class="shop-title">Groceries near you</div>
+                <div class="kv"><strong>English:</strong> Groceries near you</div>
+                <div class="kv"><strong>Telugu:</strong> మీ దగ్గర సరుకులు</div>
+            </div>
+            <div class="actions">
+                <button class="secondary" onclick="showSectionSmooth('home-screen')">Back to Home</button>
+            </div>
+        </section>
+
+        <section class="card hidden" id="pharmacy-screen">
+            <h2>Pharmacy / మందులు</h2>
+            <div class="shop-card">
+                <div class="shop-title">Pharmacy near you</div>
+                <div class="kv"><strong>English:</strong> Pharmacy near you</div>
+                <div class="kv"><strong>Telugu:</strong> మీ దగ్గర మెడిసిన్</div>
+            </div>
+            <div class="actions">
+                <button class="secondary" onclick="showSectionSmooth('home-screen')">Back to Home</button>
+            </div>
+        </section>
+
+        <section class="card hidden" id="vendor-dashboard-screen">
+            <h2>Vendor Dashboard</h2>
+            <p class="muted" id="vendor-meta">Manage items and incoming orders.</p>
+
+            <h3>Item Manager</h3>
+            <div id="vendor-item-manager"></div>
+
+            <h3 style="margin-top:14px;">Incoming Orders</h3>
+            <div id="incoming-orders"></div>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = "http://localhost:8081/api";
+        const PYTHON_BASE = "http://localhost:5000";
+        let session = { phone: null, role: null };
+        let selectedLoginType = "CUSTOMER";
+        const VENDOR_ITEMS_KEY = "gramswaram_vendor_items";
+        const VENDOR_ORDERS_KEY = "gramswaram_vendor_orders";
+        const defaultVendorItems = [
+            { name: "Idli", price: 20, inStock: true },
+            { name: "Dosa", price: 50, inStock: true },
+            { name: "Vada", price: 25, inStock: true }
+        ];
+        const demoIncomingOrders = [
+            { customerName: "Ravi", itemsOrdered: "Idli x2, Vada x1", lat: 16.5595, lng: 80.7921 },
+            { customerName: "Lakshmi", itemsOrdered: "Dosa x1", lat: 16.5682, lng: 80.8010 }
+        ];
+
+        function setStatus(id, text, isError = false) {
+            const el = document.getElementById(id);
+            el.textContent = text;
+            el.className = "status " + (isError ? "error" : "ok");
+        }
+
+        async function speakViaPython(message) {
+            try {
+                await fetch(`${PYTHON_BASE}/speak`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: message })
+                });
+            } catch (e) {
+                console.warn("Python speak service unavailable");
+            }
+        }
+
+        function showSectionSmooth(sectionId) {
+            const ids = ["login-screen", "gps-screen", "home-screen", "shops-screen", "food-screen", "groceries-screen", "pharmacy-screen", "vendor-dashboard-screen"];
+            ids.forEach((id) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (id === sectionId) return;
+                el.classList.add("hidden");
+            });
+
+            const target = document.getElementById(sectionId);
+            if (!target) return;
+            target.classList.remove("hidden");
+            target.style.opacity = "0";
+            target.style.transform = "translateY(10px)";
+            target.style.transition = "opacity 250ms ease, transform 250ms ease";
+            requestAnimationFrame(() => {
+                target.style.opacity = "1";
+                target.style.transform = "translateY(0)";
+            });
+        }
+
+        function teluguLoginGreeting() {
+            return "నమస్కారం! గ్రామ స్వరం కి స్వాగతం. గరం గరం ఇడ్లీ కావాలా లేకపోతే రోజు వాడే సరుకులు కావాలా?";
+        }
+
+        async function playTeluguLoginGreeting() {
+            await speakViaPython(teluguLoginGreeting());
+        }
+
+        function selectLoginType(type) {
+            selectedLoginType = type;
+            const isVendor = type === "VENDOR";
+
+            document.getElementById("customer-login-btn").classList.toggle("active", !isVendor);
+            document.getElementById("vendor-login-btn").classList.toggle("active", isVendor);
+            document.getElementById("customer-form").classList.toggle("hidden", isVendor);
+            document.getElementById("vendor-form").classList.toggle("hidden", !isVendor);
+        }
+
+        function getLoginPayload() {
+            if (selectedLoginType === "VENDOR") {
+                const vendorPhone = document.getElementById("vendor-phone").value.trim();
+                return { phone: vendorPhone, role: "VENDOR" };
+            }
+            const customerPhone = document.getElementById("customer-phone").value.trim();
+            return { phone: customerPhone, role: "USER" };
+        }
+
+        function fillDemoCredentials() {
+            selectLoginType("CUSTOMER");
+            document.getElementById("customer-phone").value = "9000000001";
+            setStatus("auth-status", "Demo credentials loaded.", false);
+        }
+
+        async function requestOtp() {
+            const { phone, role } = getLoginPayload();
+            if (!phone) {
+                setStatus("auth-status", "Phone is required.", true);
+                return;
+            }
+            await speakViaPython("OTP enter cheyandi");
+            try {
+                const res = await fetch(`${API_BASE}/auth/request-otp`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ phone, role })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    setStatus("auth-status", typeof data === "string" ? data : "OTP request failed.", true);
+                    return;
+                }
+                document.getElementById("otp").value = data.otp || "";
+                setStatus("auth-status", `OTP sent. Demo OTP: ${data.otp}`, false);
+            } catch (err) {
+                setStatus("auth-status", "Server not reachable for OTP request.", true);
+            }
+        }
+
+        async function verifyOtp() {
+            const { phone, role } = getLoginPayload();
+            const otp = document.getElementById("otp").value.trim();
+            if (!phone || !otp) {
+                setStatus("auth-status", "Phone and OTP are required.", true);
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/verify-otp`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ phone, role, otp })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    setStatus("auth-status", data.status || "Invalid OTP.", true);
+                    return;
+                }
+
+                session = { phone, role };
+                setStatus("auth-status", `Login success: ${role} ${phone}`, false);
+
+                if (role !== "USER") {
+                    session.vendorName = document.getElementById("vendor-name").value.trim();
+                    session.vendorShopName = document.getElementById("vendor-shop-name").value.trim();
+                    showSectionSmooth("vendor-dashboard-screen");
+                    initVendorDashboard();
+                    return;
+                }
+
+                document.getElementById("login-badge").textContent = `Logged in: ${role} - ${phone}`;
+                document.getElementById("gps-screen-status").textContent = "Please turn on GPS / జీపీఎస్ ఆన్ చేయండి";
+                showSectionSmooth("gps-screen");
+
+                if (!navigator.geolocation) {
+                    document.getElementById("gps-screen-status").textContent = "Geolocation is not supported in this browser.";
+                    return;
+                }
+
+                speakViaPython("GPS on cheyandi");
+                navigator.geolocation.getCurrentPosition(
+                    async (pos) => {
+                        session.latitude = pos.coords.latitude;
+                        session.longitude = pos.coords.longitude;
+
+                        showSectionSmooth("home-screen");
+                        document.getElementById("gps-screen-status").textContent = "";
+                        document.getElementById("home-voice-status").textContent = "";
+
+                        // Exactly when Home appears:
+                        playTeluguLoginGreeting();
+                        // Start voice command once after home transition
+                        setTimeout(() => startHomeVoiceRecognition(), 650);
+                    },
+                    (err) => {
+                        document.getElementById("gps-screen-status").textContent =
+                            "GPS permission denied. Please allow location access and try again.";
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } catch (err) {
+                setStatus("auth-status", "Server error during OTP verification.", true);
+            }
+        }
+
+        async function onHomeCardClick(category) {
+            if (category === "FOOD") {
+                renderCustomerFoodMenu();
+                showSectionSmooth("food-screen");
+                await speakViaPython("ఆహారం పేజీ చూపిస్తున్నాను");
+                return;
+            }
+            if (category === "GROCERIES") {
+                showSectionSmooth("groceries-screen");
+                await speakViaPython("సరుకులు పేజీ చూపిస్తున్నాను");
+                return;
+            }
+            if (category === "PHARMACY") {
+                showSectionSmooth("pharmacy-screen");
+                await speakViaPython("మందుల పేజీ చూపిస్తున్నాను");
+                return;
+            }
+        }
+
+        function requestGpsAgain() {
+            if (!navigator.geolocation) {
+                document.getElementById("gps-screen-status").textContent = "Geolocation is not supported in this browser.";
+                return;
+            }
+
+            document.getElementById("gps-screen-status").textContent = "Detecting GPS location...";
+            speakViaPython("GPS on cheyandi");
+
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    session.latitude = pos.coords.latitude;
+                    session.longitude = pos.coords.longitude;
+
+                    showSectionSmooth("home-screen");
+                    document.getElementById("gps-screen-status").textContent = "";
+                    document.getElementById("home-voice-status").textContent = "";
+
+                    playTeluguLoginGreeting();
+                    setTimeout(() => startHomeVoiceRecognition(), 650);
+                },
+                () => {
+                    document.getElementById("gps-screen-status").textContent =
+                        "GPS permission denied. Please allow location access and try again.";
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        async function startHomeVoiceRecognition() {
+            const statusEl = document.getElementById("home-voice-status");
+            statusEl.textContent = "Listening for: Food / Idli / Groceries...";
+
+            try {
+                const res = await fetch(`${PYTHON_BASE}/listen-telugu-text`);
+                const data = await res.json();
+                if (!res.ok || data.status !== "success") {
+                    statusEl.textContent = "Could not understand. Please try again.";
+                    return;
+                }
+
+                const spoken = (data.text || "").trim();
+                statusEl.textContent = `You said: ${spoken}`;
+
+                const normalized = spoken.toLowerCase();
+                const saysIdli = normalized.includes("idli") || spoken.includes("ఇడ్లీ") || spoken.includes("ఇడ్లి");
+                const saysFood = normalized.includes("food") || spoken.includes("Food");
+                const saysGroceries = normalized.includes("groceries") || spoken.includes("సరుకులు");
+
+                if (saysIdli || saysFood) {
+                    renderCustomerFoodMenu();
+                    showSectionSmooth("food-screen");
+                    await speakViaPython("ఫుడ్ పేజీ చూపిస్తున్నాను");
+                } else if (saysGroceries) {
+                    showSectionSmooth("groceries-screen");
+                    await speakViaPython("సరుకులు పేజీ చూపిస్తున్నాను");
+                } else {
+                    await speakViaPython("దయచేసి Food లేదా Groceries అని చెప్పండి.");
+                    statusEl.textContent = "Say Food / Idli / Groceries";
+                }
+            } catch (err) {
+                statusEl.textContent = "Voice service unavailable. Please try again later.";
+            }
+        }
+
+        function getVendorItems() {
+            try {
+                const raw = localStorage.getItem(VENDOR_ITEMS_KEY);
+                if (!raw) return [...defaultVendorItems];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) && parsed.length ? parsed : [...defaultVendorItems];
+            } catch {
+                return [...defaultVendorItems];
+            }
+        }
+
+        function saveVendorItems(items) {
+            localStorage.setItem(VENDOR_ITEMS_KEY, JSON.stringify(items));
+        }
+
+        function getVendorOrders() {
+            try {
+                const raw = localStorage.getItem(VENDOR_ORDERS_KEY);
+                if (!raw) return [...demoIncomingOrders];
+                const parsed = JSON.parse(raw);
+                return Array.isArray(parsed) ? parsed : [...demoIncomingOrders];
+            } catch {
+                return [...demoIncomingOrders];
+            }
+        }
+
+        function saveVendorOrders(orders) {
+            localStorage.setItem(VENDOR_ORDERS_KEY, JSON.stringify(orders));
+        }
+
+        function initVendorDashboard() {
+            const vendorName = session.vendorName || "Vendor";
+            const shopName = session.vendorShopName || "My Shop";
+            document.getElementById("vendor-meta").textContent = `${vendorName} - ${shopName}`;
+            renderVendorItemManager();
+            renderIncomingOrders();
+        }
+
+        function renderVendorItemManager() {
+            const items = getVendorItems();
+            const container = document.getElementById("vendor-item-manager");
+
+            container.innerHTML = items.map((item, index) => `
+                <div class="vendor-item-row">
+                    <div><strong>${item.name}</strong><br><span class="muted">Price: ₹${item.price}</span></div>
+                    <label class="switch">
+                        <input type="checkbox" ${item.inStock ? "checked" : ""} onchange="toggleVendorItem(${index}, this.checked)">
+                        <span class="slider"></span>
+                    </label>
+                    <div class="stock-label ${item.inStock ? "on" : "off"}">${item.inStock ? "On" : "Out of Stock"}</div>
+                </div>
+            `).join("");
+        }
+
+        function toggleVendorItem(index, checked) {
+            const items = getVendorItems();
+            if (!items[index]) return;
+            items[index].inStock = checked;
+            saveVendorItems(items);
+            renderVendorItemManager();
+            renderCustomerFoodMenu();
+        }
+
+        function renderCustomerFoodMenu() {
+            const items = getVendorItems();
+            const customerMenu = document.getElementById("customer-food-menu");
+            if (!customerMenu) return;
+
+            const html = items.map((item) => {
+                if (!item.inStock) {
+                    return `<div><strong>${item.name}</strong> - ₹${item.price} <span class="stock-label off">(Out of Stock)</span></div>`;
+                }
+                return `<div><strong>${item.name}</strong> - ₹${item.price}</div>`;
+            }).join("");
+
+            customerMenu.innerHTML = `<strong>Menu:</strong>${html}`;
+        }
+
+        function renderIncomingOrders() {
+            const container = document.getElementById("incoming-orders");
+            const orders = getVendorOrders();
+            container.innerHTML = orders.map((order) => `
+                <div class="shop-card" style="margin-bottom:10px;">
+                    <div class="kv"><strong>Customer Name:</strong> ${order.customerName}</div>
+                    <div class="kv"><strong>Items Ordered:</strong> ${order.itemsOrdered}</div>
+                    <div class="kv"><strong>GPS:</strong> ${order.lat.toFixed(4)}, ${order.lng.toFixed(4)}</div>
+                    <iframe
+                        class="mini-map"
+                        loading="lazy"
+                        src="https://www.openstreetmap.org/export/embed.html?bbox=${order.lng - 0.01}%2C${order.lat - 0.01}%2C${order.lng + 0.01}%2C${order.lat + 0.01}&layer=mapnik&marker=${order.lat}%2C${order.lng}">
+                    </iframe>
+                </div>
+            `).join("");
+        }
+
+        function parseTeluguOrDigitQuantity(text) {
+            const normalized = (text || "").trim().toLowerCase();
+            const teluguMap = {
+                "ఒక": 1, "ఒక్క": 1, "ఒకటి": 1,
+                "రెండు": 2,
+                "మూడు": 3,
+                "నాలుగు": 4,
+                "ఐదు": 5,
+                "ఆరు": 6,
+                "ఏడు": 7,
+                "ఎనిమిది": 8,
+                "తొమ్మిది": 9,
+                "పది": 10,
+                "పదకొండు": 11,
+                "పన్నెండు": 12,
+                "పదమూడు": 13,
+                "పద్నాలుగు": 14,
+                "పదిహేను": 15
+            };
+
+            const digitMatch = normalized.match(/\d+/);
+            if (digitMatch) {
+                const n = parseInt(digitMatch[0], 10);
+                if (!Number.isNaN(n)) return n;
+            }
+
+            for (const [word, count] of Object.entries(teluguMap)) {
+                if (normalized.includes(word)) return count;
+            }
+            return 1;
+        }
+
+        function parseMultiItemOrder(spokenText) {
+            const spoken = (spokenText || "").trim();
+            const lower = spoken.toLowerCase();
+            const segments = lower.split(/,| మరియు | and /).map(s => s.trim()).filter(Boolean);
+            const sourceSegments = spoken.split(/,| మరియు | and /).map(s => s.trim()).filter(Boolean);
+
+            const items = [];
+            const knownItems = [
+                { key: "Idli", aliases: ["idli", "ఇడ్లీ", "ఇడ్లి", "ఇడ్లీలు", "ఇడ్లులు"] },
+                { key: "Dosa", aliases: ["dosa", "దోశ", "దోస", "దోశా"] },
+                { key: "Vada", aliases: ["vada", "వడ", "వడా", "వడలు"] }
+            ];
+
+            for (let i = 0; i < segments.length; i += 1) {
+                const segLower = segments[i];
+                const segSource = sourceSegments[i];
+                const match = knownItems.find(item => item.aliases.some(a => segLower.includes(a.toLowerCase()) || segSource.includes(a)));
+                if (!match) continue;
+
+                const qty = parseTeluguOrDigitQuantity(segSource);
+                const existing = items.find(x => x.name === match.key);
+                if (existing) {
+                    existing.quantity += qty;
+                } else {
+                    items.push({ name: match.key, quantity: qty });
+                }
+            }
+
+            if (items.length === 0) {
+                if (lower.includes("idli") || spoken.includes("ఇడ్లీ") || spoken.includes("ఇడ్లి")) {
+                    items.push({ name: "Idli", quantity: parseTeluguOrDigitQuantity(spoken) });
+                }
+            }
+
+            return items;
+        }
+
+        function toTeluguQuantityText(quantity) {
+            const reverseMap = {
+                1: "ఒక",
+                2: "రెండు",
+                3: "మూడు",
+                4: "నాలుగు",
+                5: "ఐదు",
+                6: "ఆరు",
+                7: "ఏడు",
+                8: "ఎనిమిది",
+                9: "తొమ్మిది",
+                10: "పది",
+                11: "పదకొండు",
+                12: "పన్నెండు",
+                13: "పదమూడు",
+                14: "పద్నాలుగు",
+                15: "పదిహేను"
+            };
+            return reverseMap[quantity] || `${quantity}`;
+        }
+
+        function addOrderToVendorDashboard(order) {
+            const orders = getVendorOrders();
+            orders.unshift(order);
+            saveVendorOrders(orders);
+            renderIncomingOrders();
+        }
+
+        async function startFoodOrderVoiceRecognition() {
+            const statusEl = document.getElementById("food-order-status");
+            const summaryEl = document.getElementById("food-order-summary");
+            statusEl.textContent = "Listening for your food order...";
+            summaryEl.classList.add("hidden");
+
+            try {
+                const res = await fetch(`${PYTHON_BASE}/listen-telugu-text`);
+                const data = await res.json();
+                if (!res.ok || data.status !== "success") {
+                    statusEl.textContent = "Could not understand the order. Try again.";
+                    return;
+                }
+
+                const spoken = (data.text || "").trim();
+                const parsedItems = parseMultiItemOrder(spoken);
+                if (!parsedItems.length) {
+                    await speakViaPython("దయచేసి ఇడ్లీ లేదా దోశ లాంటి ఆర్డర్ చెప్పండి.");
+                    statusEl.textContent = "No valid food items found in speech.";
+                    return;
+                }
+
+                const vendorItems = getVendorItems();
+                const unavailable = parsedItems.filter(orderItem => {
+                    const vendorItem = vendorItems.find(v => v.name.toLowerCase() === orderItem.name.toLowerCase());
+                    return !vendorItem || !vendorItem.inStock;
+                });
+                if (unavailable.length > 0) {
+                    const names = unavailable.map(i => i.name).join(", ");
+                    await speakViaPython(`${names} is currently not available`);
+                    statusEl.textContent = `${names} is currently not available`;
+                    return;
+                }
+
+                const pricedItems = parsedItems.map(orderItem => {
+                    const vendorItem = vendorItems.find(v => v.name.toLowerCase() === orderItem.name.toLowerCase());
+                    const price = vendorItem ? vendorItem.price : 0;
+                    return {
+                        ...orderItem,
+                        unitPrice: price,
+                        lineTotal: price * orderItem.quantity
+                    };
+                });
+
+                const total = pricedItems.reduce((sum, i) => sum + i.lineTotal, 0);
+                const speechParts = pricedItems.map(i => `${toTeluguQuantityText(i.quantity)} ${i.name} కి ${i.lineTotal} రూపాయలు`);
+                const speech = `${speechParts.join(", ")}. మొత్తం ${total} రూపాయలు అవుతుంది. మీ ఆర్డర్ ని మీ నాన్నగారి హోటల్ (Sri Rama Tea & Tiffins) కి పంపిస్తున్నాను.`;
+                await speakViaPython(speech);
+
+                const customerName = session.phone ? `Customer ${session.phone}` : "Customer";
+                const lat = typeof session.latitude === "number" ? session.latitude : 16.5595;
+                const lng = typeof session.longitude === "number" ? session.longitude : 80.7921;
+                const orderedText = pricedItems.map(i => `${i.name} x${i.quantity}`).join(", ");
+                addOrderToVendorDashboard({
+                    customerName,
+                    itemsOrdered: `${orderedText} (₹${total})`,
+                    lat,
+                    lng
+                });
+
+                statusEl.textContent = `Order captured: ${spoken}`;
+                summaryEl.innerHTML = `<strong>Order Sent:</strong> ${orderedText} - ₹${total}`;
+                summaryEl.classList.remove("hidden");
+            } catch (err) {
+                statusEl.textContent = "Voice service unavailable. Please try again.";
+            }
+        }
+
+        function findNearbyShops() {
+            if (!navigator.geolocation) {
+                setStatus("gps-status", "Geolocation is not supported in this browser.", true);
+                return;
+            }
+            speakViaPython("GPS on cheyandi");
+            setStatus("gps-status", "Detecting GPS location...", false);
+            navigator.geolocation.getCurrentPosition(
+                (pos) => loadNearbyShops(pos.coords.latitude, pos.coords.longitude),
+                () => setStatus("gps-status", "Location permission denied. Use demo location.", true),
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        function loadNearbyWithFallback() {
+            loadNearbyShops(16.5595, 80.7921);
+        }
+
+        async function loadNearbyShops(lat, lng) {
+            try {
+                setStatus("gps-status", `Loading shops near ${lat.toFixed(4)}, ${lng.toFixed(4)}...`, false);
+                const vendorRes = await fetch(`${API_BASE}/vendors/nearby?lat=${lat}&lng=${lng}&radiusKm=15`);
+                const vendors = await vendorRes.json();
+                if (!vendorRes.ok) {
+                    setStatus("gps-status", "Could not fetch nearby shops.", true);
+                    return;
+                }
+                await renderNearbyShops(vendors);
+                setStatus("gps-status", `Found ${vendors.length} shop(s) within 15km.`, false);
+                await speakViaPython("Meeku daggara lo unna shops list ikkada undi");
+            } catch (err) {
+                setStatus("gps-status", "Server not reachable for nearby shops.", true);
+            }
+        }
+
+        async function renderNearbyShops(vendors) {
+            const list = document.getElementById("shop-list");
+            if (!vendors || vendors.length === 0) {
+                list.innerHTML = "<div class='shop-card'>No nearby shops found.</div>";
+                return;
+            }
+
+            const productRes = await fetch(`${API_BASE}/products`);
+            const products = productRes.ok ? await productRes.json() : [];
+
+            list.innerHTML = vendors.map(vendor => {
+                const vendorProducts = products.filter(p => p.vendor && p.vendor.id === vendor.id).slice(0, 5);
+                const productHtml = vendorProducts.length
+                    ? `<ul class="product-list">${vendorProducts.map(p =>
+                        `<li>${p.displayName || `${p.item_name_english} - ${p.item_name_telugu}`} (${p.displayCategory || `${p.categoryEnglish || ""} - ${p.categoryTelugu || ""}`}) - ₹${p.price}</li>`
+                    ).join("")}</ul>`
+                    : "<div class='kv'>No products yet.</div>";
+
+                return `<div class="shop-card">
+                    <div class="shop-title">${vendor.name || "Unnamed shop"}</div>
+                    <div class="kv"><strong>Location:</strong> ${vendor.location || "N/A"}</div>
+                    <div class="kv"><strong>Phone:</strong> ${vendor.phone || "N/A"}</div>
+                    <div class="kv"><strong>Products:</strong></div>
+                    ${productHtml}
+                </div>`;
+            }).join("");
+        }
+
+        window.addEventListener("load", () => {
+            speakViaPython("Namaskaram GramSwaram ki Swagatham...");
+            renderCustomerFoodMenu();
+            renderIncomingOrders();
+        });
+    </script>
+</body>
+</html>
